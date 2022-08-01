@@ -1,0 +1,157 @@
+CREATE TABLE indicadores_covid (
+	source_id varchar NULL,
+	datanotificacao varchar NULL,
+	datainiciosintomas varchar NULL,
+	sintomas varchar NULL,
+	profissionalsaude varchar NULL,
+	racacor varchar NULL,
+	outrossintomas varchar NULL,
+	sexo varchar NULL,
+	uf varchar NULL,
+	municipio varchar NULL,
+	dataprimeiradose varchar NULL,
+	datasegundadose varchar NULL,
+	codigolaboratorioprimeiradose varchar NULL,
+	codigolaboratoriosegundadose varchar NULL,
+	idade integer NULL
+);
+
+Unicidade:
+Select
+count(source_id)-COUNT(distinct source_id)
+from indicadores_covid
+
+
+
+
+Preenchimento:
+
+Código Primeira dose:
+Select
+(count(codigolaboratorioprimeiradose)/COUNT(dataprimeiradose))*100 
+from indicadores_covid
+
+Código Segunda dose:
+Select
+(count(codigolaboratoriosegundadose)/COUNT(datasegundadose))*100
+from indicadores_covid
+
+Demais:
+Select 
+(COUNT(variável)/count(source_id))*100
+from indicadores_covid
+
+
+Consistência:
+
+-Profisionais
+select 
+sum(case when  "replace"."profissionalsaude_acento" = 'SIM' or "replace"."profissionalsaude_acento" = 'NAO' or "replace"."profissionalsaude_acento" is null then null else 1 end)
+from
+(select
+upper(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(profissionalsaude,'ã','a'), 'á', 'a'),'à','a'),'â','a'),'é','e'),'ê','e'),'è','e'),'í','i'),'î','i'),'ì','i'),'ñ','n'),'ó','o'),'ô','o'),'õ','o'),'ô','o'),'ú','u')) as "profissionalsaude_acento"
+from indicadores_covid)"replace"
+
+
+-RacaCor
+select 
+sum(case when  "replace"."variavel_acento" = 'AMARELA' or "replace"."variavel_acento" = 'BRANCA' or "replace"."variavel_acento" = 'IGNORADO' or "replace"."variavel_acento" = 'INDIGENA' or "replace"."variavel_acento" = 'PARDA' or "replace"."variavel_acento" = 'PRETA' or "replace"."variavel_acento" is null then null else 1 end)
+from
+(select
+upper(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(racacor,'ã','a'), 'á', 'a'),'à','a'),'â','a'),'é','e'),'ê','e'),'è','e'),'í','i'),'î','i'),'ì','i'),'ñ','n'),'ó','o'),'ô','o'),'õ','o'),'ô','o'),'ú','u')) as "variavel_acento"
+from indicadores_covid)"replace"
+
+-Sexo
+select 
+sum(case when  "replace"."variavel_acento" = 'MASCULINO' or "replace"."variavel_acento" = 'FEMININO' or "replace"."variavel_acento" = 'INDEFINIDO' or "replace"."variavel_acento" is null then null else 1 end)
+from
+(select
+upper(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(sexo,'ã','a'), 'á', 'a'),'à','a'),'â','a'),'é','e'),'ê','e'),'è','e'),'í','i'),'î','i'),'ì','i'),'ñ','n'),'ó','o'),'ô','o'),'õ','o'),'ô','o'),'ú','u')) as "variavel_acento"
+from indicadores_covid)"replace"
+
+-Código Laboratório Primeira Dose
+select 
+sum(case when  "replace"."variavel_acento" = 'ASTRAZENECA/FIOCRUZ' or "replace"."variavel_acento" = 'JANSSEN' or "replace"."variavel_acento" = 'SINOVAC/BUTANTAN' or "replace"."variavel_acento" = 'PFIZER' or "replace"."variavel_acento" is null then null else 1 end)
+from
+(select
+upper(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(codigolaboratorioprimeiradose,'ã','a'), 'á', 'a'),'à','a'),'â','a'),'é','e'),'ê','e'),'è','e'),'í','i'),'î','i'),'ì','i'),'ñ','n'),'ó','o'),'ô','o'),'õ','o'),'ô','o'),'ú','u')) as "variavel_acento"
+from indicadores_covid)"replace"
+
+-Código Laboratório Segunda Dose
+select 
+sum(case when  "replace"."variavel_acento" = 'ASTRAZENECA/FIOCRUZ' or "replace"."variavel_acento" = 'JANSSEN' or "replace"."variavel_acento" = 'SINOVAC/BUTANTAN' or "replace"."variavel_acento" = 'PFIZER' or "replace"."variavel_acento" is null then null else 1 end)
+from
+(select
+upper(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(codigolaboratoriosegundadose ,'ã','a'), 'á', 'a'),'à','a'),'â','a'),'é','e'),'ê','e'),'è','e'),'í','i'),'î','i'),'ì','i'),'ñ','n'),'ó','o'),'ô','o'),'õ','o'),'ô','o'),'ú','u')) as "variavel_acento"
+from indicadores_covid)"replace"
+
+-Data Notificação
+select
+sum(case when datanotificacao > '2020-01-04' and datanotificacao < '2022-07-22' or datanotificacao is null then 0 else 1 end)
+from indicadores_covid
+
+-Data Inicio Sintomas
+select
+sum(case when datainiciosintomas > '2020-01-04' and datainiciosintomas < '2022-07-22' or datainiciosintomas is null then 0 else 1 end)
+from indicadores_covid
+
+-Data Primeira Dose
+select
+sum(case when dataprimeiradose > '2020-03-23' and dataprimeiradose < '2022-07-22' and dataprimeiradose < datasegundadose  or dataprimeiradose is null or datasegundadose is null then 0 else 1 end)
+from indicadores_covid
+
+-Data Segunda Dose
+select
+source_id,dataprimeiradose,datasegundadose,
+(case when dataSegundaDose > '2020-08-19' and dataSegundaDose < '2022-07-22' and dataSegundaDose > dataPrimeiraDose 
+or dataSegundaDose is null then 0 else 1 end) 
+from indicadores_covid
+
+-Idade
+select sum(case when idade < 122 then 0 else 1 end) from indicadores_covid
+
+
+-UF
+select
+case when uf = uf_ibge or uf is null then null else 1 end
+from indicadores_covid
+left join ibge on uf=uf_ibge
+
+Abrangência:
+select 
+uf,
+count(source_id)
+from indicadores_covid
+where uf is not null
+group by uf
+
+
+Padronização:
+
+-Acento
+
+select
+sum(case when variável = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(variável,'ã','a'), 'á', 'a'),'à','a'),'â','a'),'é','e'),'ê','e'),'è','e'),'í','i'),'î','i'),'ì','i'),'ñ','n'),'ó','o'),'ô','o'),'õ','o'),'ô','o'),'ú','u') 
+or variável is null then null else 1 end)
+from indicadores_covid
+
+onde exixte "variável" trocar pela variável em estudo.
+
+
+-Maiúsculo
+select
+sum(case when variável= 
+upper(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(variável,'ã','a'), 'á', 'a'),'à','a'),'â','a'),'é','e'),'ê','e'),'è','e'),'í','i'),'î','i'),'ì','i'),'ñ','n'),'ó','o'),'ô','o'),'õ','o'),'ô','o'),'ú','u'))
+or variável is null then null else 1 end)
+from indicadores_covid
+
+onde exixte "variável" trocar pela variável em estudo.
+
+Número:
+
+select
+count(outrossintomas)
+from indicadores_covid	 
+where outrossintomas like '%0%' or outrossintomas like '%1%' or outrossintomas like '%2%' or outrossintomas like '%3%'
+or outrossintomas like '%4%' or outrossintomas like '%5%' or outrossintomas like '%6%' or outrossintomas like '%7%'
+or outrossintomas like '%8%' or outrossintomas like '%9%'
