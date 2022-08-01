@@ -118,13 +118,19 @@ from indicadores_covid
 left join ibge on uf=uf_ibge
 
 Abrangência:
-select 
-uf,
-count(source_id)
+select
+uf, 
+round((cast(count(source_id)as numeric)/cast("total"."total" as numeric))*100,2) as "contagem"
+from 
+(select
+sum(case when source_id is not null then 1 else null end) as total
 from indicadores_covid
-where uf is not null
-group by uf
+where uf is not null)total
 
+inner join indicadores_covid on "source_id" = source_id
+where uf is not null
+group by uf, total
+order by "contagem" desc
 
 Padronização:
 
